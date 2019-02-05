@@ -1,7 +1,7 @@
 from flask import Flask
+from flask import jsonify
 import cypher_app.cyphers as cyphers
 from cypher_datto import CypherDatto
-from flask import jsonify
 app = Flask(__name__)
 app.env = "Development"
 app.debug = True
