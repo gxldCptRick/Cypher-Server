@@ -25,7 +25,7 @@ def decrypt_route(cypher_name, message, key):
 
 @app.route("/")
 def primary_get_routes():
-    return jsonify(available_cyphers)
+    return jsonify( [e.serialize() for e in available_cyphers])
 
 
 @app.route("/<cypher_name>")
