@@ -1,3 +1,6 @@
+from message_response import MessageResponse
+
+
 class CypherDatto(object):
     def __init__(self, module, url):
         super(CypherDatto, self).__init__()
@@ -17,7 +20,7 @@ class CypherDatto(object):
             decrypted_output = self.module.decrypt(message)
         else:
             decrypted_output = self.module.decrypt(key, message)
-        return decrypted_output
+        return MessageResponse(decrypted_output)
 
     def encrypt(self, message, key):
         encrypted_output = None
@@ -25,7 +28,7 @@ class CypherDatto(object):
             encrypted_output = self.module.encrypt(message)
         else:
             encrypted_output = self.module.encrypt(key, message)
-        return encrypted_output
+        return MessageResponse(encrypted_output)
 
     def serialize(self):
         return {
