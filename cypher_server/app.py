@@ -60,11 +60,14 @@ def generateMessageData(cypher_name, method, message, key):
 
 @app.route("/<cypher_name>/encrypt/", methods=["POST"])
 def encrypt_post_route(cypher_name):
+    
+    #parse the json out and send this to the encrypt route to get encrypted
     pass
 
 
 @app.route("/<cypher_name>/decrypt", methods=["POST"])
 def decrypt_post_route(cypher_name):
+    #parse the json out and send this to the decrypt route to get decrypt
     pass
 
 
