@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import cypher_app.cyphers as cyphers
-from cypher_datto import CypherDatto
+from cypher_server.cypher_datto import CypherDatto
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
