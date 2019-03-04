@@ -48,7 +48,6 @@ def generateMessageData(cypher_name, method, message, key):
     status_code = 404
     if(cypher is not None):
         try:
-
             message = getattr(cypher, method)(message, key)
             response["data"] = message.serialize()
             response["successful"] = True
