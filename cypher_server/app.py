@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, json
 import cypher_app.cyphers as cyphers
 from cypher_server.cypher_datto import CypherDatto
 from flask_cors import CORS
@@ -9,7 +9,7 @@ app.env = "Development"
 app.debug = True
 HOST = "localhost"
 PORT = 5000
-URL_TEMPLATE = "http://%s:%s/%s"
+URL_TEMPLATE = "http://%s:%s/%s/"
 
 available_cyphers = [CypherDatto(e, URL_TEMPLATE % (
     HOST, PORT, e.name)) for e in cyphers.cyphers]
@@ -26,29 +26,28 @@ def primary_get_routes():
 
 @app.route("/<cypher_name>/encrypt/<message>/<key>")
 def encrypt_route(cypher_name, message, key):
-    status_code, response = generateMessageData(
+    status_code, response = generate_message_data(
         cypher_name, "encrypt", message, key)
-    json = jsonify(response)
-    json.status_code = status_code
-    return json
+    jsonResponse = jsonify(response)
+    jsonResponse.status_code = status_code
+    return jsonResponse
 
 
 @app.route("/<cypher_name>/decrypt/<message>/<key>")
 def decrypt_route(cypher_name, message, key):
-    status_code, response = generateMessageData(
+    status_code, response = generate_message_data(
         cypher_name, "decrypt", message, key)
-    json = jsonify(response)
-    json.status_code = status_code
-    return json
+    jsonResponse = jsonify(response)
+    jsonResponse.status_code = status_code
+    return jsonResponse
 
 
-def generateMessageData(cypher_name, method, message, key):
-    cypher = getCypherFromName(cypher_name)
+def generate_message_data(cypher_name, method, message, key):
+    cypher = get_cypher_from_name(cypher_name)
     response = {"data": None, "successful": False}
     status_code = 404
     if(cypher is not None):
         try:
-
             message = getattr(cypher, method)(message, key)
             response["data"] = message.serialize()
             response["successful"] = True
@@ -60,56 +59,63 @@ def generateMessageData(cypher_name, method, message, key):
 
 @app.route("/<cypher_name>/encrypt/", methods=["POST"])
 def encrypt_post_route(cypher_name):
-    
-    #parse the json out and send this to the encrypt route to get encrypted
-    pass
+    obj = request.json
+    (status_code, response) = generate_message_data(
+        cypher_name, "encrypt", obj["message"], obj["key"])
+    flask_response = jsonify(response)
+    flask_response.status_code = status_code
+    return flask_response
 
 
-@app.route("/<cypher_name>/decrypt", methods=["POST"])
+@app.route("/<cypher_name>/decrypt/", methods=["POST"])
 def decrypt_post_route(cypher_name):
-    #parse the json out and send this to the decrypt route to get decrypt
-    pass
+    obj = request.json
+    (status_code, response) = generate_message_data(
+        cypher_name, "decrypt", obj["message"], obj["key"])
+    flask_response = jsonify(response)
+    flask_response.status_code = status_code
+    return flask_response
 
 
-@app.route("/<cypher_name>/encrypt")
-def getCypherEncryptInfo(cypher_name):
-    cypher = getCypherFromName(cypher_name)
+@app.route("/<cypher_name>/encrypt/", methods=["GET"])
+def get_cypher_encrypt_info(cypher_name):
+    cypher = get_cypher_from_name(cypher_name)
     response = None
     if(cypher is None):
         response = {"successful": True, "data": None}
     else:
         response = {"successful": True, "data": {
-            "encryptUrl": "%s/encrypt/<message>/<key>" % (cypher.url),
+            "encryptUrl": "%sencrypt/<message>/<key>" % (cypher.url),
             "messageTemplate": "<message>",
             "keyTemplate": "<key>"
         }}
     return jsonify(response)
 
 
-@app.route("/<cypher_name>/decrypt")
-def getCypherDecryptInfo(cypher_name):
-    cypher = getCypherFromName(cypher_name)
+@app.route("/<cypher_name>/decrypt/", methods=["GET"])
+def get_cypher_decrypt_info(cypher_name):
+    cypher = get_cypher_from_name(cypher_name)
     response = None
     if(cypher is None):
         response = {"successful": True, "data": None}
     else:
         response = {"successful": True, "data": {
-            "decryptUrl": "%s/encrypt/<message>/<key>" % (cypher.url),
+            "decryptUrl": "%sdecrypt/<message>/<key>" % (cypher.url),
             "messageTemplate": "<message>",
             "keyTemplate": "<key>"
         }}
     return jsonify(response)
 
 
-@app.route("/<cypher_name>")
+@app.route("/<cypher_name>/")
 def get_cypher(cypher_name):
-    cypher = getCypherFromName(cypher_name)
+    cypher = get_cypher_from_name(cypher_name)
     result = None
     if(cypher is not None):
         result = {
             "data": {
-                "decryptUrl": "%s/decrypt" % cypher.url,
-                "encryptUrl": "%s/encrypt" % cypher.url,
+                "decryptUrl": "%sdecrypt/" % cypher.url,
+                "encryptUrl": "%sencrypt/" % cypher.url,
             },
             "successful": True
         }
@@ -121,7 +127,7 @@ def get_cypher(cypher_name):
     return jsonify(result)
 
 
-def getCypherFromName(name):
+def get_cypher_from_name(name):
     cypher_list = list(filter(lambda e: e.name.upper() ==
                               name.upper(), available_cyphers))
     return cypher_list[0] if len(cypher_list) > 0 else None
