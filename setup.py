@@ -7,7 +7,7 @@ setup(name='cypher_server',
       author='GXLD CPT RICK',
       author_email='andreshcar@live.com',
       license='Apache License 2.0',
-      packages=['app'],
+      packages=['cypher_server'],
       install_requires=[
           'cypher_app', 'flask', 'flask_cors'
       ],

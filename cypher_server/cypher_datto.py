@@ -1,4 +1,4 @@
-from message_response import MessageResponse
+from cypher_server.message_response import MessageResponse
 
 
 class CypherDatto(object):
