@@ -7,8 +7,8 @@ CORS(app)
 
 app.env = "Development"
 app.debug = True
-HOST = "localhost"
-PORT = 5000
+HOST = "cryptickryptonite.tk"
+PORT = 80
 URL_TEMPLATE = "http://%s:%s/%s/"
 
 available_cyphers = [CypherDatto(e, URL_TEMPLATE % (
@@ -134,4 +134,4 @@ def get_cypher_from_name(name):
 
 
 if __name__ == "__main__":
-    app.run(port=PORT, host=HOST)
+    app.run(port=PORT, host="0.0.0.0")
