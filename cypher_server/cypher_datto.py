@@ -17,9 +17,9 @@ class CypherDatto(object):
     def decrypt(self, message, key):
         decrypted_output = None
         if(self.key_type == "none"):
-            decrypted_output = self.module.decrypt(message)
+            decrypted_output = self.module.decrypt(message=message)
         else:
-            decrypted_output = self.module.decrypt(key, message)
+            decrypted_output = self.module.decrypt(key=key, message=message)
         return MessageResponse(decrypted_output)
 
     def encrypt(self, message, key):
