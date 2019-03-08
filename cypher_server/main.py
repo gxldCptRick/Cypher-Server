@@ -135,4 +135,4 @@ def get_cypher_from_name(name):
 
 
 if __name__ == "__main__":
-    app.run(port=PORT, host="localhost")
+    app.run(port=PORT, host="0.0.0.0")
