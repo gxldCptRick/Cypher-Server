@@ -45,16 +45,19 @@ def decrypt_route(cypher_name, message, key):
 
 def generate_message_data(cypher_name, method, message, key):
     cypher = get_cypher_from_name(cypher_name)
-    response = {"data": None, "successful": False}
+    response = {"data": {"message": "Cypher Not Found"}, "successful": False}
     status_code = 404
     if(cypher is not None):
         try:
+            print(method, cypher)
             message = getattr(cypher, method)(message, key)
+            print(message.serialize())
             response["data"] = message.serialize()
             response["successful"] = True
             status_code = 200
         except AssertionError as e:
             status_code = 500
+            response["data"] = {"message": str(e)}
     return (status_code, response)
 
 
@@ -71,6 +74,7 @@ def encrypt_post_route(cypher_name):
 @app.route("/<cypher_name>/decrypt/", methods=["POST"])
 def decrypt_post_route(cypher_name):
     obj = request.json
+    print(obj)
     (status_code, response) = generate_message_data(
         cypher_name, "decrypt", obj["message"], obj["key"])
     flask_response = jsonify(response)
@@ -83,13 +87,20 @@ def get_cypher_encrypt_info(cypher_name):
     cypher = get_cypher_from_name(cypher_name)
     response = None
     if(cypher is None):
-        response = {"successful": True, "data": None}
+        response = {
+            "successful": False,
+            "data": {
+                "message": "Cypher Not Found"
+            }
+        }
     else:
-        response = {"successful": True, "data": {
-            "encryptUrl": "%sencrypt/<message>/<key>" % (cypher.url),
-            "messageTemplate": "<message>",
-            "keyTemplate": "<key>"
-        }}
+        response = {
+            "successful": True,
+            "data": {
+                "encryptUrl": "%sencrypt/<message>/<key>" % (cypher.url),
+                "messageTemplate": "<message>",
+                "keyTemplate": "<key>"
+            }}
     return jsonify(response)
 
 
@@ -98,7 +109,12 @@ def get_cypher_decrypt_info(cypher_name):
     cypher = get_cypher_from_name(cypher_name)
     response = None
     if(cypher is None):
-        response = {"successful": True, "data": None}
+        response = {
+            "successful": False,
+            "data": {
+                "message": "Cypher Not Found"
+            }
+        }
     else:
         response = {"successful": True, "data": {
             "decryptUrl": "%sdecrypt/<message>/<key>" % (cypher.url),
@@ -122,8 +138,10 @@ def get_cypher(cypher_name):
         }
     else:
         result = {
-            "data": None,
-            "successful": False
+            "successful": False,
+            "data": {
+                "message": "Cypher Not Found"
+            }
         }
     return jsonify(result)
 

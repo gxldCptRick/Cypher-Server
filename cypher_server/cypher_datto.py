@@ -25,9 +25,9 @@ class CypherDatto(object):
     def encrypt(self, message, key):
         encrypted_output = None
         if(self.key_type == "none"):
-            encrypted_output = self.module.encrypt(message)
+            encrypted_output = self.module.encrypt(message=message)
         else:
-            encrypted_output = self.module.encrypt(key, message)
+            encrypted_output = self.module.encrypt(key=key, message=message)
         return MessageResponse(encrypted_output)
 
     def serialize(self):
