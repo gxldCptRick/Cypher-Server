@@ -46,7 +46,7 @@ CORS(app)
 app.env = "Development"
 app.debug = True
 # HOST = "cryptickryptonite.tk"
-HOST = "localhost"
+HOST = "69.27.22.220"
 PORT = 5000
 URL_TEMPLATE = "http://%s:%s/%s/"
 
