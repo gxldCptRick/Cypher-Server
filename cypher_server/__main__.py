@@ -33,8 +33,9 @@ map = {
 }
 
 def unEncryptMessage(message=""):
+    print(''.join(message))
     deEscaped = message
-    for key in map.keys:
+    for key in map.keys():
         deEscaped = map[key].join(deEscaped.split(key))
     return deEscaped
 
@@ -45,7 +46,7 @@ CORS(app)
 app.env = "Development"
 app.debug = True
 # HOST = "cryptickryptonite.tk"
-HOST = "69.27.22.220"
+HOST = "localhost"
 PORT = 5000
 URL_TEMPLATE = "http://%s:%s/%s/"
 
@@ -86,9 +87,7 @@ def generate_message_data(cypher_name, method, message, key):
     status_code = 404
     if(cypher is not None):
         try:
-            print(method, cypher)
             message = getattr(cypher, method)(unEncryptMessage(message), key)
-            print(message.serialize())
             response["data"] = message.serialize()
             response["successful"] = True
             status_code = 200
@@ -111,7 +110,6 @@ def encrypt_post_route(cypher_name):
 @app.route("/<cypher_name>/decrypt/", methods=["POST"])
 def decrypt_post_route(cypher_name):
     obj = request.json
-    print(obj)
     (status_code, response) = generate_message_data(
         cypher_name, "decrypt", unEncryptMessage(obj["message"]), obj["key"])
     flask_response = jsonify(response)
