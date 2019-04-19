@@ -3,6 +3,41 @@ import cypher_app.cyphers as cyphers
 from cypher_server.cypher_datto import CypherDatto
 from flask_cors import CORS
 import socket
+map = {
+   "%20":" ",
+   "%24":"$",
+   "%26":"&",
+   "%60":"`",
+   "%3A":":",
+   "%3C":"<",
+   "%3E":">",
+   "%5B":"[",
+   "%5D":"]",
+   "%7B":"{",
+   "%7D":"}",
+   "%22":'"',
+   "%2B":"+",
+   "%23":"#",
+   "%25":"%",
+   "%40":"@",
+   "%2F":"/",
+   "%3B":";",
+   "%3D":"=",
+   "%3F":"?",
+   "%5C" :"\\",
+   "%5E" :"^",
+   "%7C" :"|",
+   "%7E":"~",
+   "%27":"'",
+   "%2C":","
+}
+
+def unEncryptMessage(message=""):
+    deEscaped = message
+    for key in map.keys:
+        deEscaped = map[key].join(deEscaped.split(key))
+    return deEscaped
+
 
 app = Flask(__name__)
 CORS(app)
@@ -30,7 +65,7 @@ def primary_get_routes():
 @app.route("/<cypher_name>/encrypt/<message>/<key>")
 def encrypt_route(cypher_name, message, key):
     status_code, response = generate_message_data(
-        cypher_name, "encrypt", message, key)
+        cypher_name, "encrypt", unEncryptMessage(message), key)
     jsonResponse = jsonify(response)
     jsonResponse.status_code = status_code
     return jsonResponse
@@ -39,7 +74,7 @@ def encrypt_route(cypher_name, message, key):
 @app.route("/<cypher_name>/decrypt/<message>/<key>")
 def decrypt_route(cypher_name, message, key):
     status_code, response = generate_message_data(
-        cypher_name, "decrypt", message, key)
+        cypher_name, "decrypt", unEncryptMessage(message), key)
     jsonResponse = jsonify(response)
     jsonResponse.status_code = status_code
     return jsonResponse
@@ -52,7 +87,7 @@ def generate_message_data(cypher_name, method, message, key):
     if(cypher is not None):
         try:
             print(method, cypher)
-            message = getattr(cypher, method)(message, key)
+            message = getattr(cypher, method)(unEncryptMessage(message), key)
             print(message.serialize())
             response["data"] = message.serialize()
             response["successful"] = True
@@ -67,7 +102,7 @@ def generate_message_data(cypher_name, method, message, key):
 def encrypt_post_route(cypher_name):
     obj = request.json
     (status_code, response) = generate_message_data(
-        cypher_name, "encrypt", obj["message"], obj["key"])
+        cypher_name, "encrypt", unEncryptMessage(obj["message"]), obj["key"])
     flask_response = jsonify(response)
     flask_response.status_code = status_code
     return flask_response
@@ -78,7 +113,7 @@ def decrypt_post_route(cypher_name):
     obj = request.json
     print(obj)
     (status_code, response) = generate_message_data(
-        cypher_name, "decrypt", obj["message"], obj["key"])
+        cypher_name, "decrypt", unEncryptMessage(obj["message"]), obj["key"])
     flask_response = jsonify(response)
     flask_response.status_code = status_code
     return flask_response
