@@ -2,13 +2,15 @@ from flask import Flask, request, jsonify, json
 import cypher_app.cyphers as cyphers
 from cypher_server.cypher_datto import CypherDatto
 from flask_cors import CORS
+import socket
+
 app = Flask(__name__)
 CORS(app)
 
 app.env = "Development"
 app.debug = True
 # HOST = "cryptickryptonite.tk"
-HOST = "localhost"
+HOST = "69.27.22.220"
 PORT = 5000
 URL_TEMPLATE = "http://%s:%s/%s/"
 
